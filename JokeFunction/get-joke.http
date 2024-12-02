@@ -1,0 +1,5 @@
+### GET request to example server
+
+GET https://pfviv7nwz5.execute-api.us-east-2.amazonaws.com/dev/joke/frank
+token:uspaaageyjtccfstuacmuyjqazwollym
+###

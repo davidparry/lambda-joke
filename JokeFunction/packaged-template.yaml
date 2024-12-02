@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'lambda-devlabs
+
+  Sample SAM Template for lambda-devlabs
+
+  '
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 512
+    Tracing: Active
+    LoggingConfig:
+      LogFormat: JSON
+  Api:
+    TracingEnabled: true
+Resources:
+  JokeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://lambda-functions-devlabs/joke-function/
+      Handler: ai.qodo.JokeHandler::handleRequest
+      Runtime: java21
+      Architectures:
+      - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          PARAM1: VALUE
+      Events:
+        JokeAsk:
+          Type: Api
+          Properties:
+            Path: /joke
+            Method: get
+    Metadata:
+      SamResourceId: JokeFunction
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+    Metadata:
+      SamResourceId: ApplicationResourceGroup
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+    Metadata:
+      SamResourceId: ApplicationInsightsMonitoring
+Outputs:
+  JokeFunctionApi:
+    Description: API Gateway endpoint URL for Prod stage for Joke function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/joke/
+  JokeFunction:
+    Description: JokeFunction Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - JokeFunction
+      - Arn
+  JokeFunctionIamRole:
+    Description: Implicit IAM Role created for JokeFunction
+    Value:
+      Fn::GetAtt:
+      - JokeFunctionRole
+      - Arn
