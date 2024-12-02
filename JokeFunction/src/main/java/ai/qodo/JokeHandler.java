@@ -17,6 +17,7 @@ import java.util.Map;
 
 public class JokeHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private static final Logger log = LogManager.getLogger(JokeHandler.class);
+    private final String check = "uspaaageyjtccfstuacmuyjqazwollym";
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
@@ -25,6 +26,7 @@ public class JokeHandler implements RequestHandler<APIGatewayProxyRequestEvent, 
         String name = "No Name";
         try {
             String joke = fetchJoke();
+            validate(event.getHeaders(),logger);
             if (event.getPathParameters() != null) {
                 name = event.getPathParameters().getOrDefault("rename", "NO NAME SUPPLIED");
             }
@@ -58,6 +60,19 @@ public class JokeHandler implements RequestHandler<APIGatewayProxyRequestEvent, 
             };
         }
         return logger;
+    }
+
+    private void validate(Map<String, String> headers, LambdaLogger logger) throws SecurityError {
+        boolean isValid = false;
+        if (headers != null && headers.containsKey("token")) {
+            if (headers.get("token").equals(check)) {
+                isValid = true;
+            }
+        }
+        if (!isValid) {
+            logger.log("Invalid Headers "+ headers);
+            throw new SecurityError();
+        }
     }
 
     private String fetchJoke() {
