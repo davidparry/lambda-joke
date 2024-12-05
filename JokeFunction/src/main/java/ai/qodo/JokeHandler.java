@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class JokeHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private static final Logger log = LogManager.getLogger(JokeHandler.class);
-    private final String check = "uspaaageyjtccfstuacmuyjqazwollym";
+    private final String check = System.getenv("API_TOKEN");
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
